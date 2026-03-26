@@ -192,6 +192,7 @@ Controller → Service → Repository → Database
     Build a <b>modern, responsive UI using React</b> with:
     <ul>
       <li>Interactive flight search experience</li>
+      <li>Microservice based architecture</li>
       <li>Real-time seat selection UI</li>
       <li>Booking & payment flow</li>
       <li>Integrated airport food & restaurant discovery</li>
