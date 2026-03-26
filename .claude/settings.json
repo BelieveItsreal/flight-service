@@ -1,0 +1,10 @@
+{
+  "permissions": {
+    "deny": [
+      "Read(./pom.xml)",
+      "Read(./src/test/**)",
+      "Read(./.idea/**)",
+      "Read(./target/**)"
+    ]
+  }
+}

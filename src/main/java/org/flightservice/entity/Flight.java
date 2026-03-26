@@ -6,6 +6,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Entity
 @AllArgsConstructor
@@ -23,6 +24,7 @@ public class Flight {
     private String destinationCity;
     private LocalDateTime departureTime;
     private LocalDateTime arrivalTime;
-    private int availableSeats;
-    private Double price;
+    
+    @OneToMany(mappedBy = "flight", cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
+    private List<FlightSeat> seatClasses;
 }

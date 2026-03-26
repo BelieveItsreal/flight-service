@@ -1,11 +1,11 @@
 package org.flightservice.controller;
 
+import org.flightservice.dto.FlightResponseDTO;
 import org.flightservice.entity.Flight;
 import org.flightservice.service.FlightService;
 import org.springframework.data.domain.Page;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -20,28 +20,25 @@ public class FlightController {
     private FlightService flightService;
 
     @PostMapping("/add")
-    public ResponseEntity<Flight> addFlight(@RequestBody Flight flight){
-        Flight savedFlight = flightService.addFlight(flight);
+    public ResponseEntity<FlightResponseDTO> addFlight(@RequestBody Flight flight){
+        FlightResponseDTO savedFlight = flightService.addFlight(flight);
         return ResponseEntity.status(HttpStatus.CREATED).body(savedFlight);
     }
 
     @GetMapping("/allFlights")
-    public ResponseEntity<List<Flight>> getAllFlights(){
+    public ResponseEntity<List<FlightResponseDTO>> getAllFlights(){
         return ResponseEntity.status(HttpStatus.OK).body(flightService.getAllFlights());
     }
 
     @GetMapping("/get/{id}")
-    public ResponseEntity<Flight> getFlightById(@PathVariable Long id){
-        Flight getById = flightService.getFlightById(id);
-        if (getById == null){
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
-        }else {
-            return ResponseEntity.status(HttpStatus.OK).body(getById);
-        }
+    public ResponseEntity<FlightResponseDTO> getFlightById(@PathVariable Long id){
+        FlightResponseDTO getById = flightService.getFlightById(id);
+        return ResponseEntity.status(HttpStatus.OK).body(getById);
     }
+    
     @PutMapping("/update/{id}")
-    public ResponseEntity<Flight> updateFlightDetails(@RequestBody Flight updatedData, @PathVariable Long id){
-        Flight updatedFlight = flightService.updateFlight(id, updatedData);
+    public ResponseEntity<FlightResponseDTO> updateFlightDetails(@RequestBody Flight updatedData, @PathVariable Long id){
+        FlightResponseDTO updatedFlight = flightService.updateFlight(id, updatedData);
         return ResponseEntity.status(HttpStatus.OK).body(updatedFlight);
     }
 
@@ -52,12 +49,12 @@ public class FlightController {
     }
 
     @GetMapping("/search")
-    public ResponseEntity<Page<Flight>>searchFlights(
+    public ResponseEntity<Page<FlightResponseDTO>>searchFlights(
             @RequestParam(required = false) String source,
             @RequestParam(required = false) String destination,
-            @PageableDefault(size = 5, sort = "price", direction = Sort.Direction.ASC)
+            @PageableDefault(size = 5)
             Pageable pageable){
-        Page<Flight> output = flightService.searchFlights(source, destination, pageable);
+        Page<FlightResponseDTO> output = flightService.searchFlights(source, destination, pageable);
         return ResponseEntity.status(HttpStatus.OK).body(output);
     }
 }
