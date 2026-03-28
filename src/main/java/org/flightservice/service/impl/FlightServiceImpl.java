@@ -1,9 +1,9 @@
 package org.flightservice.service.impl;
 
 import org.flightservice.dto.FlightResponseDTO;
-import org.flightservice.dto.FlightSeatResponseDTO;
 import org.flightservice.entity.Flight;
 import org.flightservice.exception.FlightNotFoundException;
+import org.flightservice.mapper.FlightMapper;
 import org.flightservice.repository.FlightRepository;
 import org.flightservice.service.FlightService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,7 +11,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
-
 import java.util.List;
 
 @Service
@@ -20,20 +19,23 @@ public class FlightServiceImpl implements FlightService {
     @Autowired
     private FlightRepository flightRepository;
 
+    @Autowired
+    private FlightMapper flightMapper;
+
     @Override
     public FlightResponseDTO addFlight(Flight flight) {
         flight.getSeatClasses().forEach(seat -> seat.setFlight(flight));    
-        return toDTO(flightRepository.save(flight));
+        return flightMapper.toDTO(flightRepository.save(flight));
     }
 
     @Override
     public List<FlightResponseDTO> getAllFlights() {
-        return  flightRepository.findAll().stream().map(this::toDTO).toList();
+        return  flightRepository.findAll().stream().map(flight -> flightMapper.toDTO(flight)).toList();
     }
 
     @Override
     public FlightResponseDTO getFlightById(Long id) {
-        return toDTO(flightRepository.findById(id).orElseThrow(() ->
+        return flightMapper.toDTO(flightRepository.findById(id).orElseThrow(() ->
                 new FlightNotFoundException("Flight not found with id: " + id)));
     }
 
@@ -48,7 +50,7 @@ public class FlightServiceImpl implements FlightService {
         existing.setDestinationCity(updatedFlightData.getDestinationCity());
         existing.setDepartureTime(updatedFlightData.getDepartureTime());
         existing.setArrivalTime(updatedFlightData.getArrivalTime());
-        return toDTO(flightRepository.save(existing));
+        return flightMapper.toDTO(flightRepository.save(existing));
     }
 
     @Override
@@ -79,28 +81,6 @@ public class FlightServiceImpl implements FlightService {
         if (result.isEmpty()) {
             throw new FlightNotFoundException("No flights found for given criteria");
         }
-        return result.map(this::toDTO);
-    }
-
-    private FlightResponseDTO toDTO(Flight flight){
-        FlightResponseDTO dto= new FlightResponseDTO();
-        dto.setId(flight.getId());
-        dto.setFlightNumber(flight.getFlightNumber());
-        dto.setSourceCode(flight.getSourceCode());
-        dto.setSourceCity(flight.getSourceCity());
-        dto.setDestinationCode(flight.getDestinationCode());
-        dto.setDestinationCity(flight.getDestinationCity());
-        dto.setDepartureTime(flight.getDepartureTime());
-        dto.setArrivalTime(flight.getArrivalTime());
-        dto.setSeatClasses(flight.getSeatClasses().stream()
-        .map(seat -> {
-            FlightSeatResponseDTO seatDto = new FlightSeatResponseDTO();
-            seatDto.setId(seat.getId());
-            seatDto.setSeatClass(seat.getSeatClass());
-            seatDto.setAvailableSeats(seat.getAvailableSeats());
-            seatDto.setPrice(seat.getPrice());
-            return seatDto;
-        }).toList());
-        return dto;
+        return result.map(flight -> flightMapper.toDTO(flight));
     }
 }

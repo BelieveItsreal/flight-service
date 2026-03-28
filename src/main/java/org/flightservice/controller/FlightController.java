@@ -2,6 +2,7 @@ package org.flightservice.controller;
 
 import org.flightservice.dto.FlightResponseDTO;
 import org.flightservice.entity.Flight;
+import org.flightservice.service.FlightSeatService;
 import org.flightservice.service.FlightService;
 import org.springframework.data.domain.Page;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,12 +13,18 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+
 
 @RestController()
 @RequestMapping("/flights")
 public class FlightController {
     @Autowired
     private FlightService flightService;
+
+    @Autowired
+    private FlightSeatService flightSeatService;
 
     @PostMapping("/add")
     public ResponseEntity<FlightResponseDTO> addFlight(@RequestBody Flight flight){
@@ -55,6 +62,16 @@ public class FlightController {
             @PageableDefault(size = 5)
             Pageable pageable){
         Page<FlightResponseDTO> output = flightService.searchFlights(source, destination, pageable);
+        return ResponseEntity.status(HttpStatus.OK).body(output);
+    }
+
+    @GetMapping("/filter/price")
+    public ResponseEntity<Page<FlightResponseDTO>>filterByPrice(
+        @RequestParam(required = false) Double minPrice,
+        @RequestParam(required = false) Double maxPrice,
+        @PageableDefault(size = 5, sort = "departureTime")
+        Pageable pageable){
+        Page<FlightResponseDTO> output = flightSeatService.getFlightByPriceRange(minPrice, maxPrice, pageable);
         return ResponseEntity.status(HttpStatus.OK).body(output);
     }
 }
