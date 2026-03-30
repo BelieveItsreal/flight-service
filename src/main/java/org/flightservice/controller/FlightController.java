@@ -17,7 +17,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
 
-@RestController()
+@RestController
 @RequestMapping("/flights")
 public class FlightController {
     @Autowired

@@ -26,4 +26,13 @@ public class GlobalExceptionHandler {
         );
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
     }
+
+    @ExceptionHandler(SeatClassNotFoundException.class)
+    public ResponseEntity<ErrorResponse> handleSeatClassNotFoundException(SeatClassNotFoundException ex){
+        ErrorResponse error = new ErrorResponse(
+            ex.getMessage(), 
+            HttpStatus.NOT_FOUND.value(), 
+        "Not Found");
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(error);
+    }
 }

@@ -27,6 +27,5 @@ public class FlightMapper{
             return seatDto;
         }).toList());
         return dto;
-    }
-    
+    }  
 }
