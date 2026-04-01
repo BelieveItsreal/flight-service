@@ -15,8 +15,9 @@ public class BookingMapper {
         dto.setDepartureTime(booking.getFlight().getDepartureTime());
         dto.setArrivalTime(booking.getFlight().getArrivalTime());
         dto.setSeatClass(booking.getSeatClass());
-        dto.setPassengerName(booking.getPassengerName());
-        dto.setPassengerEmail(booking.getPassengerEmail());
+        dto.setPassengerName(booking.getUser().getName());
+        dto.setPassengerEmail(booking.getUser().getEmail());
+        dto.setPassportNumber(booking.getUser().getPassportNumber());
         dto.setPriceAtBooking(booking.getPriceAtBooking());
         dto.setBookingTime(booking.getBookingTime());
         dto.setStatus(booking.getStatus());

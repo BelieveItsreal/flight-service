@@ -22,6 +22,7 @@ public class BookingResponseDTO {
     private SeatClass seatClass;
     private String passengerName;
     private String passengerEmail;
+    private String passportNumber;
     private Double priceAtBooking;
     private LocalDateTime bookingTime;
     private BookingStatus status;
