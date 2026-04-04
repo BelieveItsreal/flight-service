@@ -17,7 +17,7 @@ public class BookingMapper {
         dto.setSeatClass(booking.getSeatClass());
         dto.setPassengerName(booking.getUser().getName());
         dto.setPassengerEmail(booking.getUser().getEmail());
-        dto.setPassportNumber(booking.getUser().getPassportNumber());
+        dto.setPassportNumber(booking.getPassportNumber());
         dto.setPriceAtBooking(booking.getPriceAtBooking());
         dto.setBookingTime(booking.getBookingTime());
         dto.setStatus(booking.getStatus());

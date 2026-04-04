@@ -45,4 +45,24 @@ public class GlobalExceptionHandler {
         );
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(error);
     }
+
+    @ExceptionHandler(BookingNotFoundException.class)
+    public ResponseEntity<ErrorResponse> handleBookingNotFoundException(BookingNotFoundException ex){
+        ErrorResponse error = new ErrorResponse(
+            ex.getMessage(),
+            HttpStatus.NOT_FOUND.value(),
+            "Not Found"
+        );
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(error);
+    }
+
+    @ExceptionHandler(ActiveBookingsExistException.class)
+    public ResponseEntity<ErrorResponse> handleActiveBookingsExistException(ActiveBookingsExistException ex){
+        ErrorResponse error = new ErrorResponse(
+            ex.getMessage(),
+            HttpStatus.CONFLICT.value(),
+            "Conflict"
+        );
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(error);
+    }
 }

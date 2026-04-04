@@ -10,6 +10,7 @@ import org.flightservice.entity.Flight;
 import org.flightservice.entity.FlightSeat;
 import org.flightservice.entity.User;
 import org.flightservice.enums.BookingStatus;
+import org.flightservice.exception.BookingNotFoundException;
 import org.flightservice.exception.FlightNotFoundException;
 import org.flightservice.exception.SeatClassNotFoundException;
 import org.flightservice.exception.UserNotFoundException;
@@ -65,6 +66,7 @@ public class BookingServiceImpl implements BookingService{
         booking.setUser(user);
         booking.setSeatClass(request.getSeatClass());
         booking.setPriceAtBooking(seat.getPrice());
+        booking.setPassportNumber(request.getPassportNumber());
         booking.setBookingTime(LocalDateTime.now());
         booking.setStatus(BookingStatus.CONFIRMED);
 
@@ -84,4 +86,15 @@ public class BookingServiceImpl implements BookingService{
         return bookingMapper.toDto(bookingRepository.findById(id).orElseThrow(() 
         -> new SeatClassNotFoundException("Seat Booking not found with booking id: "+ id)));
     }
+
+    @Override
+    public BookingResponseDTO cancelBooking(Long id) {
+        Booking booking = bookingRepository.findById(id).orElseThrow(()
+        -> new BookingNotFoundException("Booking not found with id: "+id));
+        booking.setStatus(BookingStatus.CANCELLED);
+        FlightSeat seat = booking.getFlightSeat();
+        seat.setAvailableSeats(seat.getAvailableSeats()+1);
+        flightSeatRepository.save(seat);
+        return bookingMapper.toDto(bookingRepository.save(booking));
+    }  
 }

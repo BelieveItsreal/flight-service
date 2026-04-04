@@ -46,6 +46,8 @@ public class Booking {
 
     private Double priceAtBooking;
 
+    private String passportNumber;
+
     private LocalDateTime bookingTime;
 
     @Enumerated(EnumType.STRING)

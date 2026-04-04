@@ -13,4 +13,5 @@ public class BookingRequestDTO {
     private Long flightId;
     private SeatClass seatClass;
     private Long userId;
+    private String passportNumber;
 }

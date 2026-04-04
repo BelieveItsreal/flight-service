@@ -14,9 +14,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
-
-
-
+import org.springframework.web.bind.annotation.PutMapping;
 
 @RestController
 @RequestMapping("/bookings")
@@ -39,6 +37,11 @@ public class BookingController {
     @GetMapping("/get/{id}")
     public ResponseEntity<BookingResponseDTO> getBookingById(@PathVariable Long id) {
         return ResponseEntity.status(HttpStatus.OK).body(bookingService.getBookingById(id));
+    }
+
+    @PutMapping("cancel/{id}")
+    public ResponseEntity<BookingResponseDTO>cancelBooking(@PathVariable long id){
+        return ResponseEntity.status(HttpStatus.OK).body(bookingService.cancelBooking(id));
     }
     
 }
