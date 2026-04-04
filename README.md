@@ -9,6 +9,8 @@
   <img src="https://img.shields.io/badge/SpringBoot-3.x-brightgreen?style=for-the-badge" />
   <img src="https://img.shields.io/badge/Database-MySQL-blue?style=for-the-badge" />
   <img src="https://img.shields.io/badge/Architecture-Monolith-yellow?style=for-the-badge" />
+  <img width="791" height="871" alt="system design for flight app" src="https://github.com/user-attachments/assets/59d02219-a190-4dee-84c1-fb34eb203329" />
+
 </p>
 
 <hr/>
