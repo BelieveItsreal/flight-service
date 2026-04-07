@@ -1,7 +1,7 @@
 package org.flightservice.controller;
 
+import org.flightservice.dto.FlightRequestDTO;
 import org.flightservice.dto.FlightResponseDTO;
-import org.flightservice.entity.Flight;
 import org.flightservice.service.FlightSeatService;
 import org.flightservice.service.FlightService;
 import org.springframework.data.domain.Page;
@@ -12,7 +12,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
@@ -27,14 +26,18 @@ public class FlightController {
     private FlightSeatService flightSeatService;
 
     @PostMapping("/add")
-    public ResponseEntity<FlightResponseDTO> addFlight(@RequestBody Flight flight){
+    public ResponseEntity<FlightResponseDTO> addFlight(@RequestBody FlightRequestDTO flight){
         FlightResponseDTO savedFlight = flightService.addFlight(flight);
         return ResponseEntity.status(HttpStatus.CREATED).body(savedFlight);
     }
 
     @GetMapping("/allFlights")
-    public ResponseEntity<List<FlightResponseDTO>> getAllFlights(){
-        return ResponseEntity.status(HttpStatus.OK).body(flightService.getAllFlights());
+    public ResponseEntity<Page<FlightResponseDTO>> getAllFlights(
+        @PageableDefault(size = 5, sort = "id")
+        Pageable pageable
+        )
+    {
+        return ResponseEntity.status(HttpStatus.OK).body(flightService.getAllFlights(pageable));
     }
 
     @GetMapping("/get/{id}")
@@ -44,7 +47,7 @@ public class FlightController {
     }
     
     @PutMapping("/update/{id}")
-    public ResponseEntity<FlightResponseDTO> updateFlightDetails(@RequestBody Flight updatedData, @PathVariable Long id){
+    public ResponseEntity<FlightResponseDTO> updateFlightDetails(@RequestBody FlightRequestDTO updatedData, @PathVariable Long id){
         FlightResponseDTO updatedFlight = flightService.updateFlight(id, updatedData);
         return ResponseEntity.status(HttpStatus.OK).body(updatedFlight);
     }

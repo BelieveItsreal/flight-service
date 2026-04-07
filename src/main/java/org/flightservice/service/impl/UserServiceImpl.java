@@ -1,5 +1,6 @@
 package org.flightservice.service.impl;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 import org.flightservice.dto.UserRequestDTO;
@@ -58,10 +59,13 @@ public class UserServiceImpl implements UserService{
         -> new UserNotFoundException("User not found with id: "+id));
 
         List<Booking> activeBookings = bookingRepository.findByUserIdAndStatus(id, BookingStatus.CONFIRMED);
-        if (!activeBookings.isEmpty()) {
-            throw new ActiveBookingsExistException("Cannot delete account. You have " 
-            + activeBookings.size() + " active booking(s). Please cancel them first.");
-        }
+        List<Booking> upcomingBookings = activeBookings.stream()
+            .filter(b -> b.getFlight().getDepartureTime().isAfter(LocalDateTime.now()))
+            .toList();
+        if (!upcomingBookings.isEmpty()) {
+            throw new ActiveBookingsExistException("Cannot delte account. You have " + upcomingBookings.size() + 
+            " active booking(s) with upcoming flights. Please cancel them first");
+        } 
         bookingRepository.deleteByUserId(id);
         userRepository.delete(user);
     }   

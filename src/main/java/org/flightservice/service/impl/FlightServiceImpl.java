@@ -1,5 +1,6 @@
 package org.flightservice.service.impl;
 
+import org.flightservice.dto.FlightRequestDTO;
 import org.flightservice.dto.FlightResponseDTO;
 import org.flightservice.entity.Flight;
 import org.flightservice.exception.FlightNotFoundException;
@@ -23,14 +24,14 @@ public class FlightServiceImpl implements FlightService {
     private FlightMapper flightMapper;
 
     @Override
-    public FlightResponseDTO addFlight(Flight flight) {
-        flight.getSeatClasses().forEach(seat -> seat.setFlight(flight));    
+    public FlightResponseDTO addFlight(FlightRequestDTO request) {
+        Flight flight = flightMapper.toEntity(request);
         return flightMapper.toDTO(flightRepository.save(flight));
     }
 
     @Override
-    public List<FlightResponseDTO> getAllFlights() {
-        return  flightRepository.findAll().stream().map(flight -> flightMapper.toDTO(flight)).toList();
+    public Page<FlightResponseDTO> getAllFlights(Pageable pageable) {
+        return  flightRepository.findAll(pageable).map(flight -> flightMapper.toDTO(flight));
     }
 
     @Override
@@ -40,16 +41,10 @@ public class FlightServiceImpl implements FlightService {
     }
 
     @Override
-    public FlightResponseDTO updateFlight(Long id, Flight updatedFlightData) {
+    public FlightResponseDTO updateFlight(Long id, FlightRequestDTO request) {
         Flight existing = flightRepository.findById(id).orElseThrow(() ->
                 new FlightNotFoundException("Flight not found with id: " + id));
-        existing.setFlightNumber(updatedFlightData.getFlightNumber());
-        existing.setSourceCode(updatedFlightData.getSourceCode());
-        existing.setSourceCity(updatedFlightData.getSourceCity());
-        existing.setDestinationCode(updatedFlightData.getDestinationCode());
-        existing.setDestinationCity(updatedFlightData.getDestinationCity());
-        existing.setDepartureTime(updatedFlightData.getDepartureTime());
-        existing.setArrivalTime(updatedFlightData.getArrivalTime());
+        flightMapper.updateEntity(request, existing);
         return flightMapper.toDTO(flightRepository.save(existing));
     }
 

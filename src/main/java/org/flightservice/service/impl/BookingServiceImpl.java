@@ -91,6 +91,9 @@ public class BookingServiceImpl implements BookingService{
     public BookingResponseDTO cancelBooking(Long id) {
         Booking booking = bookingRepository.findById(id).orElseThrow(()
         -> new BookingNotFoundException("Booking not found with id: "+id));
+        if (booking.getFlight().getDepartureTime().isBefore(LocalDateTime.now())) {
+            throw new IllegalArgumentException("Can not cancel booking, Flight is already departed");
+        }
         booking.setStatus(BookingStatus.CANCELLED);
         FlightSeat seat = booking.getFlightSeat();
         seat.setAvailableSeats(seat.getAvailableSeats()+1);

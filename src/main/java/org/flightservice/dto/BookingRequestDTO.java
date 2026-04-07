@@ -3,6 +3,9 @@ package org.flightservice.dto;
 import org.flightservice.enums.SeatClass;
 
 import lombok.AllArgsConstructor;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Pattern;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -10,8 +13,16 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class BookingRequestDTO {
+    @NotNull(message = "Id cannot be null")
     private Long flightId;
+
+    @NotNull(message = "Seatclass cannot be null")
     private SeatClass seatClass;
+
+    @NotNull(message="User Id cannot be null")
     private Long userId;
+
+    @NotBlank(message = "Passport number is required")
+    @Pattern(regexp = "^[A-Z0-9]{6,9}$", message = "Invalid passport number format")
     private String passportNumber;
 }
