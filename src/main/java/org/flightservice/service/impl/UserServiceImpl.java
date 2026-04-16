@@ -8,6 +8,7 @@ import org.flightservice.dto.UserResponseDTO;
 import org.flightservice.entity.Booking;
 import org.flightservice.entity.User;
 import org.flightservice.enums.BookingStatus;
+import org.flightservice.enums.Role;
 import org.flightservice.exception.ActiveBookingsExistException;
 import org.flightservice.exception.UserNotFoundException;
 import org.flightservice.mapper.UserMapper;
@@ -15,6 +16,7 @@ import org.flightservice.repository.BookingRepository;
 import org.flightservice.repository.UserRepository;
 import org.flightservice.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -31,13 +33,17 @@ public class UserServiceImpl implements UserService{
     @Autowired
     private UserMapper userMapper;
 
+    @Autowired 
+    private PasswordEncoder passwordEncoder;
+
 
     @Override
     public UserResponseDTO createUser(UserRequestDTO userDetail) {
         User user = new User();
         user.setName(userDetail.getName());
         user.setEmail(userDetail.getEmail());
-        user.setPassword(userDetail.getPassword());
+        user.setPassword(passwordEncoder.encode(userDetail.getPassword()));
+        user.setRole(Role.USER);
         return userMapper.toDto(userRepository.save(user));
     }
 

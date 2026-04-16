@@ -12,7 +12,10 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 @Data
-@Table(name = "flights")
+@Table(name = "flights", indexes = {
+    @Index(name = "idx_source_code", columnList = "sourceCode"),
+    @Index(name = "idx_destination_code", columnList = "destinationCode")
+})
 public class Flight {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
