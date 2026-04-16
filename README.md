@@ -1,4 +1,4 @@
-<h1 align="center">✈️ Flight Booking System</h1>
+<h1 align="center">✈️ SkyRoute – Microservices-based Flight Booking Platform</h1>
 
 <p align="center">
   <b>Industry-Level Backend System | Spring Boot | Scalable Architecture</b>

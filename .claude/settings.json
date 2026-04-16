@@ -1,9 +1,0 @@
-{
-  "permissions": {
-    "deny": [
-      "Read(./src/test/**)",
-      "Read(./.idea/**)",
-      "Read(./target/**)"
-    ]
-  }
-}
