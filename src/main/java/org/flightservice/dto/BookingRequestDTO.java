@@ -19,9 +19,6 @@ public class BookingRequestDTO {
     @NotNull(message = "Seatclass cannot be null")
     private SeatClass seatClass;
 
-    @NotNull(message="User Id cannot be null")
-    private Long userId;
-
     @NotBlank(message = "Passport number is required")
     @Pattern(regexp = "^[A-Z0-9]{6,9}$", message = "Invalid passport number format")
     private String passportNumber;

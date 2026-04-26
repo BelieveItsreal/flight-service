@@ -5,6 +5,7 @@ import java.util.List;
 import org.flightservice.dto.UserRequestDTO;
 import org.flightservice.dto.UserResponseDTO;
 
+
 public interface UserService {
     UserResponseDTO createUser(UserRequestDTO userDetail);
 
@@ -13,4 +14,6 @@ public interface UserService {
     List<UserResponseDTO> getAllUser();
 
     void deleteUser(Long id);
+
+    UserResponseDTO creatAdmin(UserRequestDTO request);
 }

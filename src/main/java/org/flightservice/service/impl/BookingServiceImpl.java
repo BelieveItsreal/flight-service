@@ -10,17 +10,18 @@ import org.flightservice.entity.Flight;
 import org.flightservice.entity.FlightSeat;
 import org.flightservice.entity.User;
 import org.flightservice.enums.BookingStatus;
+import org.flightservice.enums.Role;
 import org.flightservice.exception.BookingNotFoundException;
 import org.flightservice.exception.FlightNotFoundException;
 import org.flightservice.exception.SeatClassNotFoundException;
-import org.flightservice.exception.UserNotFoundException;
 import org.flightservice.mapper.BookingMapper;
 import org.flightservice.repository.BookingRepository;
 import org.flightservice.repository.FlightRepository;
 import org.flightservice.repository.FlightSeatRepository;
-import org.flightservice.repository.UserRepository;
 import org.flightservice.service.BookingService;
+import org.flightservice.util.SecurityUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -38,10 +39,10 @@ public class BookingServiceImpl implements BookingService{
     private FlightSeatRepository flightSeatRepository;
 
     @Autowired
-    private UserRepository userRepository;
+    private BookingMapper bookingMapper;
 
     @Autowired
-    private BookingMapper bookingMapper;
+    private SecurityUtils securityUtils;
     
     @Override
     @Transactional
@@ -49,8 +50,7 @@ public class BookingServiceImpl implements BookingService{
         Flight flight = flightRepository.findById(request.getFlightId())
         .orElseThrow(() ->  new FlightNotFoundException("Flight not found with id: "+request.getFlightId()));
 
-        User user = userRepository.findById(request.getUserId())
-        .orElseThrow(() -> new UserNotFoundException("User not found with id: "+request.getUserId()));
+        User user = securityUtils.getCurrentUser();
 
         FlightSeat seat = flightSeatRepository.findByFlightIdAndSeatClass(request.getFlightId(), request.getSeatClass())
         .orElseThrow(()-> new SeatClassNotFoundException("Seat class not available"));
@@ -79,20 +79,33 @@ public class BookingServiceImpl implements BookingService{
     }
 
     public List<BookingResponseDTO> getAllBooking(){
-        return bookingRepository.findAll().stream().map(booking -> bookingMapper.toDto(booking)).toList();
+        User currentUser = securityUtils.getCurrentUser();
+        if (currentUser.getRole() == Role.ADMIN) {
+            return bookingRepository.findAll().stream().map(bookingMapper::toDto).toList();
+        }
+        return bookingRepository.findByUserId(currentUser.getId()).stream().map(bookingMapper::toDto).toList();
     }
 
     public BookingResponseDTO getBookingById(Long id){
-        return bookingMapper.toDto(bookingRepository.findById(id).orElseThrow(() 
-        -> new SeatClassNotFoundException("Seat Booking not found with booking id: "+ id)));
+        Booking booking = bookingRepository.findById(id).
+            orElseThrow(()-> new BookingNotFoundException("Booking not found with the id" +id));
+        User currentUser = securityUtils.getCurrentUser();
+        if (currentUser.getRole() != Role.ADMIN && !booking.getUser().getId().equals(currentUser.getId())) {
+            throw new AccessDeniedException("You can only view your own bookings");
+        }
+        return bookingMapper.toDto(booking);
     }
 
     @Override
     public BookingResponseDTO cancelBooking(Long id) {
-        Booking booking = bookingRepository.findById(id).orElseThrow(()
-        -> new BookingNotFoundException("Booking not found with id: "+id));
+        Booking booking = bookingRepository.findById(id)
+            .orElseThrow(() -> new BookingNotFoundException("Booking not found with id: "+id));
+        User currentUser = securityUtils.getCurrentUser();
+        if (currentUser.getRole() != Role.ADMIN && !booking.getUser().getId().equals(currentUser.getId())) {
+            throw new AccessDeniedException("You can only cancel your own bookings");
+        }
         if (booking.getFlight().getDepartureTime().isBefore(LocalDateTime.now())) {
-            throw new IllegalArgumentException("Can not cancel booking, Flight is already departed");
+            throw new IllegalArgumentException("Can not cancel booking, FLight is already Departed");
         }
         booking.setStatus(BookingStatus.CANCELLED);
         FlightSeat seat = booking.getFlightSeat();

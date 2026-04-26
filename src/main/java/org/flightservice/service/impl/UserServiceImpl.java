@@ -15,10 +15,14 @@ import org.flightservice.mapper.UserMapper;
 import org.flightservice.repository.BookingRepository;
 import org.flightservice.repository.UserRepository;
 import org.flightservice.service.UserService;
+import org.springframework.security.access.AccessDeniedException;
+import org.flightservice.util.SecurityUtils;
+import org.mapstruct.control.MappingControl.Use;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
 
 @Service
 public class UserServiceImpl implements UserService{
@@ -35,6 +39,10 @@ public class UserServiceImpl implements UserService{
 
     @Autowired 
     private PasswordEncoder passwordEncoder;
+
+    @Autowired
+    private SecurityUtils securityUtils;
+
 
 
     @Override
@@ -64,6 +72,11 @@ public class UserServiceImpl implements UserService{
         User user = userRepository.findById(id).orElseThrow(()
         -> new UserNotFoundException("User not found with id: "+id));
 
+        User currUser = securityUtils.getCurrentUser();
+        if (currUser.getRole() != Role.ADMIN && !currUser.getId().equals(id)) {
+            throw new AccessDeniedException("You can delete only your own account");
+        }
+
         List<Booking> activeBookings = bookingRepository.findByUserIdAndStatus(id, BookingStatus.CONFIRMED);
         List<Booking> upcomingBookings = activeBookings.stream()
             .filter(b -> b.getFlight().getDepartureTime().isAfter(LocalDateTime.now()))
@@ -74,5 +87,15 @@ public class UserServiceImpl implements UserService{
         } 
         bookingRepository.deleteByUserId(id);
         userRepository.delete(user);
+    }
+
+    @Override
+    public UserResponseDTO creatAdmin(UserRequestDTO userDetail) {
+        User user = new User();
+        user.setName(userDetail.getName());
+        user.setEmail(userDetail.getEmail());
+        user.setPassword(passwordEncoder.encode(userDetail.getPassword()));
+        user.setRole(Role.ADMIN);
+        return userMapper.toDto(userRepository.save(user));
     }   
 }
